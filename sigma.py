@@ -6,7 +6,7 @@ class SigmaFinBot:
 
     def __init__(self):
 
-        self.token = '5826602075:AAEHbmyCiJ1AilxXiGYNyKg3XmIdc87lzkA'
+        self.token = '5922935691:AAGeBCE2lumxZJMiasEQJn36JFzxdEGRBaU'
         self.urlBase = f"https://api.telegram.org/bot{self.token}/"
 
     def enviarMensagem(self, idChat, mensagem):
@@ -25,12 +25,50 @@ class SigmaFinBot:
         link_post = f'{self.urlBase}sendMessage?chat_id={chatId}&text={texto}&reply_markup={buttonsOptions}'
         requests.post(link_post)
 
-    def obterResultados(self):
+    def obterResultados(self, ultimoIdMsg):
 
-        resp = requests.get(self.urlBase + "getUpdates")
-        json = resp.json()['result'][-1]
-        try:
-            print(f"Respose [200] | ID User: {json['message']['from']['id']} ----> Message: {json['message']['text']} ")
-        except:
-            print('Response [200]')
-        return json
+        if ultimoIdMsg == '': #Inicio/Start do bot no servidor
+
+            resp = requests.get(self.urlBase + "getUpdates")
+            json = resp.json()['result'][-1]
+            try:
+                print(f"Respose [200] | ID User: {json['message']['from']['id']} ----> Message: {json['message']['text']}")
+            except:
+                print('Response [200]')
+
+            return json
+
+        else:
+
+            resp = requests.get(self.urlBase + "getUpdates")
+            json = resp.json()['result'][-1]
+            ultimoIdMsgAPI = json['update_id']
+
+            if ultimoIdMsgAPI > ultimoIdMsg:
+
+                index = -1
+                diferenca = ultimoIdMsgAPI - ultimoIdMsg
+                indexFinal = (index - diferenca)
+                listaMsgs = []
+
+                while index != indexFinal:
+
+                    try:
+
+                        json = resp.json()['result'][index]
+                        if json['message']['chat']['type'] == 'private':
+                            listaMsgs.append(json)
+                            index -= 1
+
+                    except:
+
+                        index -= 1
+                        pass
+                
+                print(listaMsgs)
+                return listaMsgs
+
+            elif ultimoIdMsgAPI == ultimoIdMsg:
+
+                json = resp.json()['result'][-1]
+                return json
