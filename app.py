@@ -1,6 +1,7 @@
 from sigma import SigmaFinBot
 from payments import createPayment
 import time
+from datetime import datetime, timedelta
 
 ultimoIdMsg = ''
 
@@ -85,12 +86,15 @@ while True:
 
                     if responseBot['message']['text'] == '💸' and responseBot['message']['chat']['type'] == 'private':
 
+                        dataHoje = datetime.now().date()
+                        dataExp = dataHoje + timedelta(days = 2)
                         idChat = responseBot['message']['from']['id']
                         nome = responseBot['message']['from']['first_name']
-                        payment = createPayment(idChat, nome)
+                        payment = createPayment(idChat, nome, dataExp)
+                        dataExp = dataExp.strftime("%d/%m/%Y")
                         SigmaFinBot().enviarMensagem(idChat, f"Recebemos sua solicitação de pagamento, {nome}! \n\n⬇️ Chave Pix ⬇️")
                         SigmaFinBot().enviarMensagem(idChat, f"{payment['chavePix']}")
-                        SigmaFinBot().enviarMensagemGuiada(idChat, f"\n\nSegue abaixo as informações do pagamento: \n\nId pagamento: {payment['idPagamento']} \nMeio de pagamento: {payment['nomeGateway']} \nPagador: {payment['pagador']} \nValor: {payment['valor']} \nDescrição: {payment['descPagamento']} \nMais informações: {payment['detalhesPag']} \n\nEspero e vejo você lá no Grupo VIP, {nome}! 🚀", ["[🗿 MENU]"])
+                        SigmaFinBot().enviarMensagemGuiada(idChat, f"\n\nSegue abaixo as informações do pagamento: \n\nId pagamento: {payment['idPagamento']} \nMeio de pagamento: {payment['nomeGateway']} \nPagador: {payment['pagador']} \nValor: {payment['valor']} \nDescrição: {payment['descPagamento']} \nData de vencimento: {dataExp} \nMais informações: {payment['detalhesPag']} \n\nEspero e vejo você lá no Grupo VIP, {nome}! 🚀", ["[🗿 MENU]"])
                     
                 except:
 
@@ -156,12 +160,15 @@ while True:
 
                     if responseBot[indexLoop]['message']['text'] == '💸' and responseBot[indexLoop]['message']['chat']['type'] == 'private':
 
+                        dataHoje = datetime.now().date()
+                        dataExp = dataHoje + timedelta(days = 2)
                         idChat = responseBot[indexLoop]['message']['from']['id']
                         nome = responseBot[indexLoop]['message']['from']['first_name']
-                        payment = createPayment(idChat, nome)
+                        payment = createPayment(idChat, nome, dataExp)
+                        dataExp = dataExp.strftime("%d/%m/%Y")
                         SigmaFinBot().enviarMensagem(idChat, f"Recebemos sua solicitação de pagamento, {nome}! \n\n⬇️ Chave Pix ⬇️")
                         SigmaFinBot().enviarMensagem(idChat, f"{payment['chavePix']}")
-                        SigmaFinBot().enviarMensagemGuiada(idChat, f"\n\nSegue abaixo as informações do pagamento: \n\nId pagamento: {payment['idPagamento']} \nMeio de pagamento: {payment['nomeGateway']} \nPagador: {payment['pagador']} \nValor: {payment['valor']} \nDescrição: {payment['descPagamento']} \nMais informações: {payment['detalhesPag']} \n\nEspero e vejo você lá no Grupo VIP, {nome}! 🚀", ["[🗿 MENU]"])
+                        SigmaFinBot().enviarMensagemGuiada(idChat, f"\n\nSegue abaixo as informações do pagamento: \n\nId pagamento: {payment['idPagamento']} \nMeio de pagamento: {payment['nomeGateway']} \nPagador: {payment['pagador']} \nValor: {payment['valor']} \nDescrição: {payment['descPagamento']} \nData de vencimento: {dataExp} \nMais informações: {payment['detalhesPag']} \n\nEspero e vejo você lá no Grupo VIP, {nome}! 🚀", ["[🗿 MENU]"])
                     
                 except:
 
