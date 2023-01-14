@@ -6,7 +6,7 @@ class SigmaFinBot:
 
     def __init__(self):
 
-        self.token = '5922935691:AAGeBCE2lumxZJMiasEQJn36JFzxdEGRBaU'
+        self.token = '5893441186:AAEEsJgj7FbjvddfBKKMA9Hl2o7NwOC1sas'
         self.urlBase = f"https://api.telegram.org/bot{self.token}/"
 
     def enviarMensagem(self, idChat, mensagem):
@@ -31,10 +31,6 @@ class SigmaFinBot:
 
             resp = requests.get(self.urlBase + "getUpdates")
             json = resp.json()['result'][-1]
-            try:
-                print(f"Respose [200] | ID User: {json['message']['from']['id']} ----> Message: {json['message']['text']}")
-            except:
-                print('Response [200]')
 
             return json
 
