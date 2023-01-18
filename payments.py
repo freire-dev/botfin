@@ -32,7 +32,7 @@ def createPayment(idChat, nome, data):
     }
 
     print(paymentObj)
-    return(paymentObj)
+    return paymentObj
 
 def statusPayment(id):
 
@@ -43,8 +43,9 @@ def statusPayment(id):
         "id": id,
         "status": f"{paymentStatus['status']}",
         "data_emissao": f"{paymentStatus['date_created']}",
-        "data_expiracao": f"{paymentStatus['date_of_expiration']}"
+        "data_expiracao": f"{paymentStatus['date_of_expiration']}",
+        "linkDetalhes": f"{paymentStatus['point_of_interaction']['transaction_data']['ticket_url']}"
     }
 
     print(data)
-    return(data)
+    return data

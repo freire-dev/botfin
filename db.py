@@ -1,17 +1,16 @@
 import mysql.connector
 from payments import statusPayment, createPayment
 
-mydb = mysql.connector.connect(
-    host='sql654.main-hosting.eu',
-    user='u935568132_luancfreire',
-    password='@55h9wy5cL',
-    database='u935568132_SigmaBet'
-)
-
-mycursor = mydb.cursor()
-
-
 def listarPagto():
+
+    mydb = mysql.connector.connect(
+        host='sql654.main-hosting.eu',
+        user='u935568132_luancfreire',
+        password='@55h9wy5cL',
+        database='u935568132_SigmaBet'
+    )
+
+    mycursor = mydb.cursor()
 
     mycursor.execute("SELECT * FROM payments ORDER BY id DESC")
     myresult = mycursor.fetchall()
@@ -32,6 +31,15 @@ def listarPagto():
 
 def listarMembros():
 
+    mydb = mysql.connector.connect(
+        host='sql654.main-hosting.eu',
+        user='u935568132_luancfreire',
+        password='@55h9wy5cL',
+        database='u935568132_SigmaBet'
+    )
+
+    mycursor = mydb.cursor()
+
     mycursor.execute("SELECT * FROM members ORDER BY id DESC")
     myresult = mycursor.fetchall()
     listResult = []
@@ -49,7 +57,16 @@ def listarMembros():
     return dataMembros
 
 
-def addPagDb(idUser, nomeUser, idPix, chavePix, statusPix, dataGerPix, dataVenc):
+def addPagDb(idUser, nomeUser, dataGer, dataVenc):
+
+    mydb = mysql.connector.connect(
+        host='sql654.main-hosting.eu',
+        user='u935568132_luancfreire',
+        password='@55h9wy5cL',
+        database='u935568132_SigmaBet'
+    )
+
+    mycursor = mydb.cursor()
 
     dataPagto = listarPagto()
     dataMembros = listarMembros()
@@ -66,8 +83,9 @@ def addPagDb(idUser, nomeUser, idPix, chavePix, statusPix, dataGerPix, dataVenc)
 
                     if dataMembros['listMembros'][countMembro][3] == 'N':  # Membro inativo
 
-                        createPayment(idUser, nomeUser, dataVenc)
-                        mycursor.execute(f"INSERT INTO payments (id, membroId, nomeMembro, idPix, chavePix, statusPix, ativo, dataInicio, dataFim) VALUES(default, {idUser}, '{nomeUser}', {idPix}, '{chavePix}', '{statusPix}', NULL, '{dataGerPix}', '{dataVenc}');")
+                        novoPag = createPayment(idUser, nomeUser, dataVenc)
+                        detalhesPag = statusPayment(novoPag['idPagamento'])
+                        mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, {idUser}, '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
                         mydb.commit()
                         countPagto = dataPagto['qtdPag']
                         countMembro = dataMembros['qtdMembros']
@@ -76,8 +94,9 @@ def addPagDb(idUser, nomeUser, idPix, chavePix, statusPix, dataGerPix, dataVenc)
 
                         if dataMembros['listMembros'][countMembro][5] == 'cancelled': #Não efetuou o pagamento do pix no prazo correto. Nesse caso é preciso enviar um novo pagamento, alterando a data de vencimento.
                           
-                          createPayment(idUser, nomeUser, dataVenc)
-                          mycursor.execute(f"INSERT INTO payments (id, membroId, nomeMembro, idPix, chavePix, statusPix, ativo, dataInicio, dataFim) VALUES(default, {idUser}, '{nomeUser}', {idPix}, '{chavePix}', '{statusPix}', NULL, '{dataGerPix}', '{dataVenc}');")
+                          novoPag = createPayment(idUser, nomeUser, dataVenc)
+                          detalhesPag = statusPayment(novoPag['idPagamento'])
+                          mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, {idUser}, '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
                           mydb.commit()
                           countPagto = dataPagto['qtdPag']
                           countMembro = dataMembros['qtdMembros']
@@ -85,6 +104,7 @@ def addPagDb(idUser, nomeUser, idPix, chavePix, statusPix, dataGerPix, dataVenc)
                         elif dataMembros['listMembros'][countMembro][5] == 'pending': #Pagamento pendente
 
                           #Reenviar informações de pagamento.
+                          print('Você já solicitou pagamento, imbecil!')
                           pass
 
                         elif dataMembros['listMembros'][countMembro][5] == 'accepted': #Membro está no prazo de pagamento. Logo, não precisa pagar outra vez.
@@ -98,8 +118,9 @@ def addPagDb(idUser, nomeUser, idPix, chavePix, statusPix, dataGerPix, dataVenc)
 
                           if dataMembros['listMembros'][countMembro][3] == 'N': #Membro inativo
 
-                            createPayment(idUser, nomeUser, dataVenc)
-                            mycursor.execute(f"INSERT INTO payments (id, membroId, nomeMembro, idPix, chavePix, statusPix, ativo, dataInicio, dataFim) VALUES(default, {idUser}, '{nomeUser}', {idPix}, '{chavePix}', '{statusPix}', NULL, '{dataGerPix}', '{dataVenc}');")
+                            novoPag = createPayment(idUser, nomeUser, dataVenc)
+                            detalhesPag = statusPayment(novoPag['idPagamento'])
+                            mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, {idUser}, '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
                             mydb.commit()
                             countPagto = dataPagto['qtdPag']
                             countMembro = dataMembros['qtdMembros']
@@ -110,20 +131,39 @@ def addPagDb(idUser, nomeUser, idPix, chavePix, statusPix, dataGerPix, dataVenc)
                             pass
 
                         else: #Não é membro
-
-                          createPayment(idUser, nomeUser, dataVenc)
-                          mycursor.execute(f"INSERT INTO payments (id, membroId, nomeMembro, idPix, chavePix, statusPix, ativo, dataInicio, dataFim) VALUES(default, {idUser}, '{nomeUser}', {idPix}, '{chavePix}', '{statusPix}', NULL, '{dataGerPix}', '{dataVenc}');")
+                             
+                          novoPag = createPayment(idUser, nomeUser, dataVenc)
+                          detalhesPag = statusPayment(novoPag['idPagamento'])
+                          mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, {idUser}, '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
                           mydb.commit()
                           countPagto = dataPagto['qtdPag']
 
+                else:  #Não é membro
+
+                    novoPag = createPayment(idUser, nomeUser, dataVenc)
+                    detalhesPag = statusPayment(novoPag['idPagamento'])
+                    print(f"INSERT INTO payments VALUES(DEFAULT, {idUser}, '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
+                    mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, {idUser}, '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
+                    mydb.commit()
+                    countPagto = dataPagto['qtdPag']
+
         else:  #Não é membro
 
-            createPayment(idUser, nomeUser, dataVenc)
-            mycursor.execute(f"INSERT INTO payments (id, membroId, nomeMembro, idPix, chavePix, statusPix, ativo, dataInicio, dataFim) VALUES(default, {idUser}, '{nomeUser}', {idPix}, '{chavePix}', '{statusPix}', NULL, '{dataGerPix}', '{dataVenc}');")
+            novoPag = createPayment(idUser, nomeUser, dataVenc)
+            detalhesPag = statusPayment(novoPag['idPagamento'])
+            print(f"INSERT INTO payments VALUES(DEFAULT, {idUser}, '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
+            mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, {idUser}, '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
             mydb.commit()
             countPagto = dataPagto['qtdPag']
 
-    mycursor.execute(f"INSERT INTO payments (id, membroId, nomeMembro, idPix, chavePix, statusPix, ativo, dataInicio, dataFim) VALUES(default, {idUser}, '{nomeUser}', {idPix}, '{chavePix}', '{statusPix}', NULL, '{dataGerPix}', '{dataVenc}');")
-    mydb.commit()
+    data = {
+       "idPagamento": novoPag['idPagamento'],
+       "nomeGateway": novoPag['nomeGateway'],
+       "pagador": novoPag['pagador'],
+       "valor": novoPag['valor'],
+       "descPagamento": novoPag['descPagamento'],
+       "chavePix": novoPag['chavePix'],
+       "detalhesPag": detalhesPag['linkDetalhes']
+    }
 
-statusPayment(53513716364)
+    return data
