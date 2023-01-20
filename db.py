@@ -1,169 +1,159 @@
 import mysql.connector
+from sigma import SigmaFinBot
 from payments import statusPayment, createPayment
 
-def listarPagto():
+class db:
 
-    mydb = mysql.connector.connect(
-        host='sql654.main-hosting.eu',
-        user='u935568132_luancfreire',
-        password='@55h9wy5cL',
-        database='u935568132_SigmaBet'
-    )
+    def __init__(self):
+        
+        self.mydb = mysql.connector.connect(
+            host='sql654.main-hosting.eu',
+            user='u935568132_luancfreire',
+            password='@55h9wy5cL',
+            database='u935568132_SigmaBet'
+        )
 
-    mycursor = mydb.cursor()
+        self.mycursor = self.mydb.cursor()
 
-    mycursor.execute("SELECT * FROM payments ORDER BY id DESC")
-    myresult = mycursor.fetchall()
-    listResult = []
+    def listarPagto(self):
 
-    for x in myresult:
-        listResult.append(x)
+        self.mycursor.execute("SELECT * FROM payments ORDER BY id DESC")
+        myresult = self.mycursor.fetchall()
+        listResult = []
 
-    dataPag = {
-        "qtdPag": listResult.__len__(),
-        "listPag": listResult
-    }
+        for x in myresult:
+            listResult.append(x)
 
-    print(dataPag)
+        dataPag = {
+            "qtdPag": listResult.__len__(),
+            "listPag": listResult
+        }
 
-    return dataPag
+        print(dataPag)
 
-
-def listarMembros():
-
-    mydb = mysql.connector.connect(
-        host='sql654.main-hosting.eu',
-        user='u935568132_luancfreire',
-        password='@55h9wy5cL',
-        database='u935568132_SigmaBet'
-    )
-
-    mycursor = mydb.cursor()
-
-    mycursor.execute("SELECT * FROM members ORDER BY id DESC")
-    myresult = mycursor.fetchall()
-    listResult = []
-
-    for x in myresult:
-        listResult.append(x)
-
-    dataMembros = {
-        "qtdMembros": listResult.__len__(),
-        "listMembros": listResult
-    }
-
-    print(dataMembros)
-
-    return dataMembros
+        return dataPag
 
 
-def addPagDb(idUser, nomeUser, dataGer, dataVenc):
+    def listarMembros(self):
 
-    mydb = mysql.connector.connect(
-        host='sql654.main-hosting.eu',
-        user='u935568132_luancfreire',
-        password='@55h9wy5cL',
-        database='u935568132_SigmaBet'
-    )
+        self.mycursor.execute("SELECT * FROM members ORDER BY id DESC")
+        myresult = self.mycursor.fetchall()
+        listResult = []
 
-    mycursor = mydb.cursor()
+        for x in myresult:
+            listResult.append(x)
 
-    dataPagto = listarPagto()
-    dataMembros = listarMembros()
-    countPagto = 0
-    countMembro = 0
+        dataMembros = {
+            "qtdMembros": listResult.__len__(),
+            "listMembros": listResult
+        }
 
-    while countPagto != dataPagto['qtdPag']:
+        print(dataMembros)
 
-        if idUser == dataPagto['listPag'][countPagto][1]:
+        return dataMembros
 
-            while countMembro != dataMembros['qtdMembros']:
 
-                if idUser == dataMembros['listMembros'][countMembro][1]: #Caso for membro
+    def addPagDb(self, idUser, nomeUser, dataGer, dataVenc):
 
-                    if dataMembros['listMembros'][countMembro][3] == 'N':  # Membro inativo
+        idUser = str(idUser)
 
-                        novoPag = createPayment(idUser, nomeUser, dataVenc)
-                        detalhesPag = statusPayment(novoPag['idPagamento'])
-                        mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, {idUser}, '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
-                        mydb.commit()
-                        countPagto = dataPagto['qtdPag']
-                        countMembro = dataMembros['qtdMembros']
+        dataPagto = self.listarPagto()
+        dataMembros = self.listarMembros()
+        countPagto = 0
+        countMembro = 0
+        addPagto = False
 
-                    elif dataMembros['listMembros'][countMembro][3] == 'Y':  # Membro ativo
+        while countPagto != dataPagto['qtdPag']:
 
-                        if dataMembros['listMembros'][countMembro][5] == 'cancelled': #Não efetuou o pagamento do pix no prazo correto. Nesse caso é preciso enviar um novo pagamento, alterando a data de vencimento.
-                          
-                          novoPag = createPayment(idUser, nomeUser, dataVenc)
-                          detalhesPag = statusPayment(novoPag['idPagamento'])
-                          mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, {idUser}, '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
-                          mydb.commit()
-                          countPagto = dataPagto['qtdPag']
-                          countMembro = dataMembros['qtdMembros']
+            if idUser == dataPagto['listPag'][countPagto][1]:
 
-                        elif dataMembros['listMembros'][countMembro][5] == 'pending': #Pagamento pendente
+                while countMembro != dataMembros['qtdMembros']:
 
-                          #Reenviar informações de pagamento.
-                          print('Você já solicitou pagamento, imbecil!')
-                          pass
+                    if idUser == dataMembros['listMembros'][countMembro][1]: #Caso for membro
 
-                        elif dataMembros['listMembros'][countMembro][5] == 'accepted': #Membro está no prazo de pagamento. Logo, não precisa pagar outra vez.
-
-                          #Notificar ao membro que o mesmo já realizou o pagamento do mês.
-                          pass
-
-                    elif countMembro == (dataMembros['qtdMembros'] - 1):
-
-                        if idUser == dataMembros['listMembros'][countMembro][1]:
-
-                          if dataMembros['listMembros'][countMembro][3] == 'N': #Membro inativo
+                        if dataMembros['listMembros'][countMembro][3] == 'N':  # Membro inativo
 
                             novoPag = createPayment(idUser, nomeUser, dataVenc)
                             detalhesPag = statusPayment(novoPag['idPagamento'])
-                            mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, {idUser}, '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
-                            mydb.commit()
+                            self.mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, '{idUser}', '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
+                            self.mydb.commit()
+                            addPagto = True
                             countPagto = dataPagto['qtdPag']
                             countMembro = dataMembros['qtdMembros']
 
-                          elif dataMembros['listMembros'][countMembro][3] == 'Y':  # Membro ativo
+                        elif dataMembros['listMembros'][countMembro][3] == 'Y':  # Membro ativo
 
-                            countMembro = dataMembros['qtdMembros']
-                            pass
+                            if dataMembros['listMembros'][countMembro][5] == 'cancelled': #Não efetuou o pagamento do pix no prazo correto. Nesse caso é preciso enviar um novo pagamento, alterando a data de vencimento.
+                            
+                                novoPag = createPayment(idUser, nomeUser, dataVenc)
+                                detalhesPag = statusPayment(novoPag['idPagamento'])
+                                self.mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, '{idUser}', '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
+                                self.mydb.commit()
+                                addPagto = True
+                                countPagto = dataPagto['qtdPag']
+                                countMembro = dataMembros['qtdMembros']
 
-                        else: #Não é membro
-                             
-                          novoPag = createPayment(idUser, nomeUser, dataVenc)
-                          detalhesPag = statusPayment(novoPag['idPagamento'])
-                          mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, {idUser}, '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
-                          mydb.commit()
-                          countPagto = dataPagto['qtdPag']
+                            elif dataMembros['listMembros'][countMembro][5] == 'pending': #Pagamento pendente
 
-                else:  #Não é membro
+                                SigmaFinBot().enviarMensagem(idUser, f"Olá, {nomeUser}. Você já está com um pagamento em aberto. Segue chave pix abaixo para efetuar o pagamento:")
+                                SigmaFinBot().enviarMensagem(idUser, f"{detalhesPag['chavePix']}")
+                                addPagto = True
+                                countPagto = dataPagto['qtdPag']
+                                countMembro = dataMembros['qtdMembros']
 
-                    novoPag = createPayment(idUser, nomeUser, dataVenc)
-                    detalhesPag = statusPayment(novoPag['idPagamento'])
-                    print(f"INSERT INTO payments VALUES(DEFAULT, {idUser}, '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
-                    mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, {idUser}, '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
-                    mydb.commit()
-                    countPagto = dataPagto['qtdPag']
+                            elif dataMembros['listMembros'][countMembro][5] == 'approved': #Membro está no prazo de pagamento. Logo, não precisa pagar outra vez.
 
-        else:  #Não é membro
+                                SigmaFinBot().enviarMensagem(idUser, f"Olá, {nomeUser}! Você ainda não precisa efetuar o pagamento do mês.")
+                                addPagto = True
+                                countPagto = dataPagto['qtdPag']
+                                countMembro = dataMembros['qtdMembros']
+
+                        elif countMembro == (dataMembros['qtdMembros'] - 1):
+
+                            if idUser == dataMembros['listMembros'][countMembro][1]:
+
+                                if dataMembros['listMembros'][countMembro][3] == 'N': #Membro inativo
+
+                                    novoPag = createPayment(idUser, nomeUser, dataVenc)
+                                    detalhesPag = statusPayment(novoPag['idPagamento'])
+                                    self.mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, '{idUser}', '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
+                                    self.mydb.commit()
+                                    addPagto = True
+                                    countPagto = dataPagto['qtdPag']
+                                    countMembro = dataMembros['qtdMembros']
+
+                                elif dataMembros['listMembros'][countMembro][3] == 'Y':  # Membro ativo
+
+                                    SigmaFinBot().enviarMensagem(idUser, f"Olá, {nomeUser}. Você já está com um pagamento em aberto. Segue chave pix abaixo para efetuar o pagamento:")
+                                    SigmaFinBot().enviarMensagem(idUser, f"{detalhesPag['chavePix']}")
+                                    addPagto = True
+                                    countPagto = dataPagto['qtdPag']
+                                    countMembro = dataMembros['qtdMembros']
+
+                    else:  #Não é membro
+
+                        countMembro += 1
+
+            else:  #Não é membro
+                
+                countPagto += 1
+                countMembro += 1
+
+        if addPagto == False:
 
             novoPag = createPayment(idUser, nomeUser, dataVenc)
             detalhesPag = statusPayment(novoPag['idPagamento'])
-            print(f"INSERT INTO payments VALUES(DEFAULT, {idUser}, '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
-            mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, {idUser}, '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
-            mydb.commit()
-            countPagto = dataPagto['qtdPag']
+            self.mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, '{idUser}', '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
+            self.mydb.commit()
 
-    data = {
-       "idPagamento": novoPag['idPagamento'],
-       "nomeGateway": novoPag['nomeGateway'],
-       "pagador": novoPag['pagador'],
-       "valor": novoPag['valor'],
-       "descPagamento": novoPag['descPagamento'],
-       "chavePix": novoPag['chavePix'],
-       "detalhesPag": detalhesPag['linkDetalhes']
-    }
+        data = {
+        "idPagamento": novoPag['idPagamento'],
+        "nomeGateway": novoPag['nomeGateway'],
+        "pagador": novoPag['pagador'],
+        "valor": novoPag['valor'],
+        "descPagamento": novoPag['descPagamento'],
+        "chavePix": novoPag['chavePix'],
+        "detalhesPag": detalhesPag['linkDetalhes']
+        }
 
-    return data
+        return data

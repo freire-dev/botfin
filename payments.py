@@ -44,6 +44,7 @@ def statusPayment(id):
         "status": f"{paymentStatus['status']}",
         "data_emissao": f"{paymentStatus['date_created']}",
         "data_expiracao": f"{paymentStatus['date_of_expiration']}",
+        "chavePix": f"{paymentStatus['point_of_interaction']['transaction_data']['qr_code']}",
         "linkDetalhes": f"{paymentStatus['point_of_interaction']['transaction_data']['ticket_url']}"
     }
 
