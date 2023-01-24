@@ -1,5 +1,6 @@
 from sigma import SigmaFinBot
 from db import db
+from free_users import dbfree
 import time
 from datetime import datetime, timedelta
 
@@ -7,18 +8,25 @@ ultimoIdMsg = ''
 
 while True:
 
-    count = 0
-    responseBot = SigmaFinBot().obterResultados(ultimoIdMsg)
+    try:
 
-    if type(responseBot) is dict:
+        count = 0
+        responseBot = SigmaFinBot().obterResultados(ultimoIdMsg)
 
-        idMsg = responseBot['update_id']
-        qtdLoop = 1
+        if type(responseBot) is dict:
 
-    elif type(responseBot) is list:
+            idMsg = responseBot['update_id']
+            qtdLoop = 1
 
-        idMsg = responseBot[0]['update_id']
-        qtdLoop = responseBot.__len__()
+        elif type(responseBot) is list:
+
+            idMsg = responseBot[0]['update_id']
+            qtdLoop = responseBot.__len__()
+
+    except:
+
+        ultimoIdMsg = ''
+        idMsg = ''
 
     if idMsg != ultimoIdMsg:
 
@@ -76,7 +84,15 @@ while True:
 
                         idChat = responseBot['message']['from']['id']
                         nome = responseBot['message']['from']['first_name']
-                        SigmaFinBot().enviarMensagemGuiada(idChat, f"Um enorme prazer em saber disso, {nome}! \n\nO valor mensal para permanecer no Grupo VIP recebendo as estatísticas em tempo real dos jogos é de R$29,90 [Somente PIX]. \n\nAssim que identificamos o pagamento, automaticamente adicionaremos você ao Grupo VIP para LUCRAR MUITO! 😎\n\nDas opções abaixo, clique para: \n💸 Realizar pagamento \n[🗿 MENU] Voltar para o menu principal", ["💸","[🗿 MENU]"])
+                        addUserFree = dbfree().addUserFree(idChat, nome)
+
+                        if addUserFree == 'Usuário adicionado':
+
+                            SigmaFinBot().enviarMensagemGuiada(idChat, f"Um enorme prazer em saber disso, {nome}! \n\nComo cortesia, para você conhecer melhor o bot de estatística, iremos adicioná-lo automáticamente para uma degustação 0800 por 2 horas para fazer suas apostas. \n\nAproveite!!!", ["[🗿 MENU]"])
+
+                        elif addUserFree == 'Já foi usuário free':
+                        
+                            SigmaFinBot().enviarMensagemGuiada(idChat, f"Um enorme prazer em saber disso, {nome}! \n\nO valor mensal para permanecer no Grupo VIP recebendo as estatísticas em tempo real dos jogos é de R$29,90 [Somente PIX]. \n\nAssim que identificamos o pagamento, automaticamente adicionaremos você ao Grupo VIP para LUCRAR MUITO! 😎\n\nDas opções abaixo, clique para: \n💸 Realizar pagamento \n[🗿 MENU] Voltar para o menu principal", ["💸","[🗿 MENU]"])
                 
                 except:
 
@@ -84,7 +100,7 @@ while True:
 
                 try:
 
-                    if responseBot['message']['text'] == '💸' and responseBot['message']['chat']['type'] == 'private':
+                    if responseBot['message']['text'] == '💸' or responseBot['message']['text'] == '💵' and responseBot['message']['chat']['type'] == 'private':
 
                         dataHoje = datetime.now().date()
                         dataExp = dataHoje + timedelta(days = 2)
@@ -150,7 +166,15 @@ while True:
 
                         idChat = responseBot[indexLoop]['message']['from']['id']
                         nome = responseBot[indexLoop]['message']['from']['first_name']
-                        SigmaFinBot().enviarMensagemGuiada(idChat, f"Um enorme prazer em saber disso, {nome}! \n\nO valor mensal para permanecer no Grupo VIP recebendo as estatísticas em tempo real dos jogos é de R$29,90 [Somente PIX]. \n\nAssim que identificamos o pagamento, automaticamente adicionaremos você ao Grupo VIP para LUCRAR MUITO! 😎\n\nDas opções abaixo, clique para: \n💸 Realizar pagamento \n[🗿 MENU] Voltar para o menu principal", ["💸","[🗿 MENU]"])
+                        addUserFree = dbfree().addUserFree(idChat, nome)
+
+                        if addUserFree == 'Usuário adicionado':
+
+                            SigmaFinBot().enviarMensagemGuiada(idChat, f"Um enorme prazer em saber disso, {nome}! \n\nComo cortesia, para você conhecer melhor o bot de estatística, iremos adicioná-lo automáticamente para uma degustação 0800 por 2 horas para fazer suas apostas. \n\nAproveite!!!", ["[🗿 MENU]"])
+
+                        elif addUserFree == 'Já foi usuário free':
+                        
+                            SigmaFinBot().enviarMensagemGuiada(idChat, f"Um enorme prazer em saber disso, {nome}! \n\nO valor mensal para permanecer no Grupo VIP recebendo as estatísticas em tempo real dos jogos é de R$29,90 [Somente PIX]. \n\nAssim que identificamos o pagamento, automaticamente adicionaremos você ao Grupo VIP para LUCRAR MUITO! 😎\n\nDas opções abaixo, clique para: \n💸 Realizar pagamento \n[🗿 MENU] Voltar para o menu principal", ["💸","[🗿 MENU]"])
                 
                 except:
 
@@ -158,7 +182,7 @@ while True:
 
                 try:
 
-                    if responseBot[indexLoop]['message']['text'] == '💸' and responseBot[indexLoop]['message']['chat']['type'] == 'private':
+                    if responseBot[indexLoop]['message']['text'] == '💸' or responseBot[indexLoop]['message']['text'] == '💵' and responseBot[indexLoop]['message']['chat']['type'] == 'private':
 
                         dataHoje = datetime.now().date()
                         dataExp = dataHoje + timedelta(days = 2)
@@ -179,10 +203,16 @@ while True:
 
             count += 1
     
-    if type(responseBot) is dict:
-        ultimoIdMsg = responseBot['update_id']
-    
-    elif type(responseBot) is list:
-        ultimoIdMsg = responseBot[0]['update_id']
+    try:
+
+        if type(responseBot) is dict:
+            ultimoIdMsg = responseBot['update_id']
+        
+        elif type(responseBot) is list:
+            ultimoIdMsg = responseBot[0]['update_id']
+
+    except:
+
+        pass
     
     time.sleep(1)

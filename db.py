@@ -1,6 +1,7 @@
 import mysql.connector
 from sigma import SigmaFinBot
 from payments import statusPayment, createPayment
+from datetime import datetime, timedelta
 
 class db:
 
@@ -15,9 +16,12 @@ class db:
 
         self.mycursor = self.mydb.cursor()
 
+        hoje = datetime.now().date()
+        self.ult6dias = hoje - timedelta(days=6)
+
     def listarPagto(self):
 
-        self.mycursor.execute("SELECT * FROM payments ORDER BY id DESC")
+        self.mycursor.execute(f"SELECT * FROM payments WHERE dataExpPix >= '{self.ult6dias}' ORDER BY id DESC")
         myresult = self.mycursor.fetchall()
         listResult = []
 
@@ -73,13 +77,23 @@ class db:
 
                         if dataMembros['listMembros'][countMembro][3] == 'N':  # Membro inativo
 
-                            novoPag = createPayment(idUser, nomeUser, dataVenc)
-                            detalhesPag = statusPayment(novoPag['idPagamento'])
-                            self.mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, '{idUser}', '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
-                            self.mydb.commit()
-                            addPagto = True
-                            countPagto = dataPagto['qtdPag']
-                            countMembro = dataMembros['qtdMembros']
+                            if dataPagto['listPag'][countPagto][5] == 'pending':
+
+                                SigmaFinBot().enviarMensagem(idUser, f"Olá, {nomeUser}. Você já está com um pagamento em aberto. Segue chave pix abaixo para efetuar o pagamento:")
+                                SigmaFinBot().enviarMensagemGuiada(idUser, f"{dataPagto['listPag'][countPagto][4]}", ["[🗿 MENU]"])
+                                addPagto = True
+                                countPagto = dataPagto['qtdPag']
+                                countMembro = dataMembros['qtdMembros']
+
+                            else:
+
+                                novoPag = createPayment(idUser, nomeUser, dataVenc)
+                                detalhesPag = statusPayment(novoPag['idPagamento'])
+                                self.mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, '{idUser}', '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
+                                self.mydb.commit()
+                                addPagto = True
+                                countPagto = dataPagto['qtdPag']
+                                countMembro = dataMembros['qtdMembros']
 
                         elif dataMembros['listMembros'][countMembro][3] == 'Y':  # Membro ativo
 
@@ -96,14 +110,14 @@ class db:
                             elif dataMembros['listMembros'][countMembro][5] == 'pending': #Pagamento pendente
 
                                 SigmaFinBot().enviarMensagem(idUser, f"Olá, {nomeUser}. Você já está com um pagamento em aberto. Segue chave pix abaixo para efetuar o pagamento:")
-                                SigmaFinBot().enviarMensagem(idUser, f"{detalhesPag['chavePix']}")
+                                SigmaFinBot().enviarMensagemGuiada(idUser, f"{dataPagto['listPag'][countPagto][4]}", ["[🗿 MENU]"])
                                 addPagto = True
                                 countPagto = dataPagto['qtdPag']
                                 countMembro = dataMembros['qtdMembros']
 
                             elif dataMembros['listMembros'][countMembro][5] == 'approved': #Membro está no prazo de pagamento. Logo, não precisa pagar outra vez.
 
-                                SigmaFinBot().enviarMensagem(idUser, f"Olá, {nomeUser}! Você ainda não precisa efetuar o pagamento do mês.")
+                                SigmaFinBot().enviarMensagemGuiada(idUser, f"Olá, {nomeUser}! Você ainda não precisa efetuar o pagamento do mês.", ["[🗿 MENU]"])
                                 addPagto = True
                                 countPagto = dataPagto['qtdPag']
                                 countMembro = dataMembros['qtdMembros']
@@ -124,14 +138,14 @@ class db:
 
                                 elif dataMembros['listMembros'][countMembro][3] == 'Y':  # Membro ativo
 
-                                    SigmaFinBot().enviarMensagem(idUser, f"Olá, {nomeUser}. Você já está com um pagamento em aberto. Segue chave pix abaixo para efetuar o pagamento:")
-                                    SigmaFinBot().enviarMensagem(idUser, f"{detalhesPag['chavePix']}")
+                                    SigmaFinBot().enviarMensagemGuiada(idUser, f"Olá, {nomeUser}! Você ainda não precisa efetuar o pagamento do mês.", ["[🗿 MENU]"])
                                     addPagto = True
                                     countPagto = dataPagto['qtdPag']
                                     countMembro = dataMembros['qtdMembros']
 
                     else:  #Não é membro
 
+                        countPagto += 1
                         countMembro += 1
 
             else:  #Não é membro
@@ -139,7 +153,24 @@ class db:
                 countPagto += 1
                 countMembro += 1
 
-        if addPagto == False:
+        if addPagto == False: #Verificando se um não membro já gerou pagamento
+
+            countPagto = 0
+
+            while countPagto != dataPagto['qtdPag']:
+
+                if idUser == dataPagto['listPag'][countPagto][1]:
+
+                    SigmaFinBot().enviarMensagem(idUser, f"Olá, {nomeUser}. Você já está com um pagamento em aberto. Segue chave pix abaixo para efetuar o pagamento:")
+                    SigmaFinBot().enviarMensagemGuiada(idUser, f"{dataPagto['listPag'][countPagto][4]}", ["[🗿 MENU]"])
+                    addPagto = True
+                    countPagto = dataPagto['qtdPag']
+
+                else:
+
+                    countPagto += 1
+
+        if addPagto == False: #Adicionando pagamento para não membros                  
 
             novoPag = createPayment(idUser, nomeUser, dataVenc)
             detalhesPag = statusPayment(novoPag['idPagamento'])
