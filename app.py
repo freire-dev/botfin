@@ -34,6 +34,8 @@ while True:
 
         while count != qtdLoop:
 
+            msgRespondida = False
+
             if type(responseBot) is dict:
 
                 ######################################### Mensagem inicial - /START #########################################
@@ -45,10 +47,12 @@ while True:
                         idChat = responseBot['message']['from']['id']
                         nome = responseBot['message']['from']['first_name']
                         SigmaFinBot().enviarMensagemGuiada(idChat, f"Olá, {nome}. como vai? \n\nBem-vindo ao Sigma Bet Bot, o melhor robô de estatísticas para apostas esportivas do Brasil! 🤖⚽ \n\nDas opções abaixo, em qual tema posso te ajudar? \n\n🏆 Grupo VIP \n", ["🏆"])
+                        msgRespondida = True
 
                 except:
                         
                     pass
+
                     
                 ######################################### Fluxo ---> ⬅ Menu Principal #########################################
 
@@ -59,7 +63,8 @@ while True:
                         idChat = responseBot['message']['from']['id']
                         nome = responseBot['message']['from']['first_name']
                         SigmaFinBot().enviarMensagemGuiada(idChat, f"Bem-vindo ao menu principal, {nome}. tudo certo? \n\nDas opções abaixo, em qual tema posso te ajudar? \n\n🏆 Grupo VIP \n", ["🏆"])
-                
+                        msgRespondida = True
+
                 except:
 
                     pass
@@ -72,8 +77,22 @@ while True:
 
                         idChat = responseBot['message']['from']['id']
                         nome = responseBot['message']['from']['first_name']
-                        SigmaFinBot().enviarMensagemGuiada(idChat, f"Perfeito, {nome}! A respeito do Grupo VIP, qual das opções abaixo posso te ajudar? \n\n📕 Informações sobre o Grupo VIP \n🚀 Desejo entrar para o Grupo VIP\n💵 Gerar o pix para o pagamento mensal\n❌ Sair do grupo VIP", ["📕","🚀", "💵", "❌"])
-                
+                        SigmaFinBot().enviarMensagemGuiada(idChat, f"Perfeito, {nome}! A respeito do Grupo VIP, qual das opções abaixo posso te ajudar? \n\n📕 Informações sobre o Grupo VIP \n🚀 Desejo entrar para o Grupo VIP\n💵 Gerar o pix para o pagamento mensal", ["📕","🚀", "💵"])
+                        msgRespondida = True
+
+                except:
+
+                    pass
+
+                try:
+
+                    if responseBot['message']['text'] == '📕' and responseBot['message']['chat']['type'] == 'private':
+
+                        idChat = responseBot['message']['from']['id']
+                        nome = responseBot['message']['from']['first_name']
+                        SigmaFinBot().enviarMensagemGuiada(idChat, f"Boa, {nome}! O Sigma bet é um grupo VIP que recebe estatísticas em tempo real de partidas AO VIVO de futebol do mundo todo. \n\nOs tipos de estatísticas: \n\n⏩ Probabilidade de Over 0.5 \n⏩ Probabilidade de Over 1.5 \n⏩ Probabilidade de Over 2.5 \n⏩ Probabilidade de Over 3.5 \n🥇 Chances de ganhar \n🥅 Placar \n⛳ Escanteios \n⚽ Chance de Gol \n💪🏻 Ofensividade \n🟢 Dominância \n⚽ Expectativa de Gol \n⏰ Ataques por minuto \n👟 Posse de Bola \n👹 Chutes perigosos \n🟨 Cartão amarelo \n🟥 Cartão vermelho", ['[🗿 MENU]'])
+                        msgRespondida = True
+
                 except:
 
                     pass
@@ -93,7 +112,9 @@ while True:
                         elif addUserFree == 'Já foi usuário free':
                         
                             SigmaFinBot().enviarMensagemGuiada(idChat, f"Um enorme prazer em saber disso, {nome}! \n\nO valor mensal para permanecer no Grupo VIP recebendo as estatísticas em tempo real dos jogos é de R$29,90 [Somente PIX]. \n\nAssim que identificamos o pagamento, automaticamente adicionaremos você ao Grupo VIP para LUCRAR MUITO! 😎\n\nDas opções abaixo, clique para: \n💸 Realizar pagamento \n[🗿 MENU] Voltar para o menu principal", ["💸","[🗿 MENU]"])
-                
+
+                        msgRespondida = True
+
                 except:
 
                     pass
@@ -108,10 +129,33 @@ while True:
                         nome = responseBot['message']['from']['first_name']
                         payment = db().addPagDb(idChat, nome, dataHoje, dataExp)
                         dataExp = dataExp.strftime("%d/%m/%Y")
-                        SigmaFinBot().enviarMensagem(idChat, f"Recebemos sua solicitação de pagamento, {nome}! \n\n⬇️ Chave Pix ⬇️")
-                        SigmaFinBot().enviarMensagem(idChat, f"{payment['chavePix']}")
-                        SigmaFinBot().enviarMensagemGuiada(idChat, f"Segue abaixo as informações do pagamento: \n\nId pagamento: {payment['idPagamento']} \nMeio de pagamento: {payment['nomeGateway']} \nPagador: {payment['pagador']} \nValor: {payment['valor']} \nDescrição: {payment['descPagamento']} \nData de vencimento: {dataExp} \n\nEspero e vejo você lá no Grupo VIP, {nome}! 🚀", ["[🗿 MENU]"])
-                    
+
+                        if payment['msgEnviada'] == False:
+
+                            SigmaFinBot().enviarMensagem(idChat, f"Recebemos sua solicitação de pagamento, {nome}! \n\n⬇️ Chave Pix ⬇️")
+                            SigmaFinBot().enviarMensagem(idChat, f"{payment['chavePix']}")
+                            SigmaFinBot().enviarMensagemGuiada(idChat, f"Segue abaixo as informações do pagamento: \n\nId pagamento: {payment['idPagamento']} \nMeio de pagamento: {payment['nomeGateway']} \nPagador: {payment['pagador']} \nValor: {payment['valor']} \nDescrição: {payment['descPagamento']} \nData de vencimento: {dataExp} \n\nEspero e vejo você lá no Grupo VIP, {nome}! 🚀", ["[🗿 MENU]"])
+                            msgRespondida = True
+                        
+                        else:
+
+                            msgRespondida = True
+                            pass
+
+                except:
+
+                    pass
+
+                ######################################### Mensagem padrão para qualquer outra msg #########################################
+
+                try:
+
+                    if msgRespondida == False:
+
+                        idChat = responseBot['message']['from']['id']
+                        nome = responseBot['message']['from']['first_name']
+                        SigmaFinBot().enviarMensagemGuiada(idChat, f"Olá, {nome}. tudo certo? \n\nInfelizmente não compreendi o que você deseja... Aconselho você em clicar no botão [🗿 MENU] e checar nosso menu com opções de atendimento.", ["[🗿 MENU]"])
+
                 except:
 
                     pass
@@ -127,10 +171,12 @@ while True:
                         idChat = responseBot[indexLoop]['message']['from']['id']
                         nome = responseBot[indexLoop]['message']['from']['first_name']
                         SigmaFinBot().enviarMensagemGuiada(idChat, f"Olá, {nome}. como vai? \n\nBem-vindo ao Sigma Bet Bot, o melhor robô de estatísticas para apostas esportivas do Brasil! 🤖⚽ \n\nDas opções abaixo, em qual tema posso te ajudar? \n\n🏆 Grupo VIP \n", ["🏆"])
+                        msgRespondida = True
 
                 except:
                         
                     pass
+
                     
                 ######################################### Fluxo ---> ⬅ Menu Principal #########################################
 
@@ -141,7 +187,8 @@ while True:
                         idChat = responseBot[indexLoop]['message']['from']['id']
                         nome = responseBot[indexLoop]['message']['from']['first_name']
                         SigmaFinBot().enviarMensagemGuiada(idChat, f"Bem-vindo ao menu principal, {nome}. tudo certo? \n\nDas opções abaixo, em qual tema posso te ajudar? \n\n🏆 Grupo VIP \n", ["🏆"])
-                
+                        msgRespondida = True
+
                 except:
 
                     pass            
@@ -154,8 +201,22 @@ while True:
 
                         idChat = responseBot[indexLoop]['message']['from']['id']
                         nome = responseBot[indexLoop]['message']['from']['first_name']
-                        SigmaFinBot().enviarMensagemGuiada(idChat, f"Perfeito, {nome}! A respeito do Grupo VIP, qual das opções abaixo posso te ajudar? \n\n📕 Informações sobre o Grupo VIP \n🚀 Desejo entrar para o Grupo VIP\n💵 Gerar o pix para o pagamento mensal\n❌ Sair do grupo VIP", ["📕","🚀", "💵", "❌"])
-                
+                        SigmaFinBot().enviarMensagemGuiada(idChat, f"Perfeito, {nome}! A respeito do Grupo VIP, qual das opções abaixo posso te ajudar? \n\n📕 Informações sobre o Grupo VIP \n🚀 Desejo entrar para o Grupo VIP\n💵 Gerar o pix para o pagamento mensal", ["📕","🚀", "💵"])
+                        msgRespondida = True
+
+                except:
+
+                    pass
+
+                try:
+
+                    if responseBot[indexLoop]['message']['text'] == '📕' and responseBot[indexLoop]['message']['chat']['type'] == 'private':
+
+                        idChat = responseBot[indexLoop]['message']['from']['id']
+                        nome = responseBot[indexLoop]['message']['from']['first_name']
+                        SigmaFinBot().enviarMensagemGuiada(idChat, f"Boa, {nome}! O Sigma bet é um grupo VIP que recebe estatísticas em tempo real de partidas AO VIVO de futebol do mundo todo. \n\nOs tipos de estatísticas: \n\n⏩ Probabilidade de Over 0.5 \n⏩ Probabilidade de Over 1.5 \n⏩ Probabilidade de Over 2.5 \n⏩ Probabilidade de Over 3.5 \n🥇 Chances de ganhar \n🥅 Placar \n⛳ Escanteios \n⚽ Chance de Gol \n💪🏻 Ofensividade \n🟢 Dominância \n⚽ Expectativa de Gol \n⏰ Ataques por minuto \n👟 Posse de Bola \n👹 Chutes perigosos \n🟨 Cartão amarelo \n🟥 Cartão vermelho", ['[🗿 MENU]'])
+                        msgRespondida = True
+
                 except:
 
                     pass
@@ -175,7 +236,9 @@ while True:
                         elif addUserFree == 'Já foi usuário free':
                         
                             SigmaFinBot().enviarMensagemGuiada(idChat, f"Um enorme prazer em saber disso, {nome}! \n\nO valor mensal para permanecer no Grupo VIP recebendo as estatísticas em tempo real dos jogos é de R$29,90 [Somente PIX]. \n\nAssim que identificamos o pagamento, automaticamente adicionaremos você ao Grupo VIP para LUCRAR MUITO! 😎\n\nDas opções abaixo, clique para: \n💸 Realizar pagamento \n[🗿 MENU] Voltar para o menu principal", ["💸","[🗿 MENU]"])
-                
+
+                        msgRespondida = True
+
                 except:
 
                     pass
@@ -190,10 +253,32 @@ while True:
                         nome = responseBot[indexLoop]['message']['from']['first_name']
                         payment = db().addPagDb(idChat, nome, dataHoje, dataExp)
                         dataExp = dataExp.strftime("%d/%m/%Y")
-                        SigmaFinBot().enviarMensagem(idChat, f"Recebemos sua solicitação de pagamento, {nome}! \n\n⬇️ Chave Pix ⬇️")
-                        SigmaFinBot().enviarMensagem(idChat, f"{payment['chavePix']}")
-                        SigmaFinBot().enviarMensagemGuiada(idChat, f"Segue abaixo as informações do pagamento: \n\nId pagamento: {payment['idPagamento']} \nMeio de pagamento: {payment['nomeGateway']} \nPagador: {payment['pagador']} \nValor: {payment['valor']} \nDescrição: {payment['descPagamento']} \nData de vencimento: {dataExp} \n\nEspero e vejo você lá no Grupo VIP, {nome}! 🚀", ["[🗿 MENU]"])
-                    
+
+                        if payment['msgEnviada'] == False:
+                            SigmaFinBot().enviarMensagem(idChat, f"Recebemos sua solicitação de pagamento, {nome}! \n\n⬇️ Chave Pix ⬇️")
+                            SigmaFinBot().enviarMensagem(idChat, f"{payment['chavePix']}")
+                            SigmaFinBot().enviarMensagemGuiada(idChat, f"Segue abaixo as informações do pagamento: \n\nId pagamento: {payment['idPagamento']} \nMeio de pagamento: {payment['nomeGateway']} \nPagador: {payment['pagador']} \nValor: {payment['valor']} \nDescrição: {payment['descPagamento']} \nData de vencimento: {dataExp} \n\nEspero e vejo você lá no Grupo VIP, {nome}! 🚀", ["[🗿 MENU]"])
+                            msgRespondida = True
+                        
+                        else:
+
+                            msgRespondida = True
+                            pass
+
+                except:
+
+                    pass
+
+                ######################################## Mensagem padrão para qualquer outra msg #########################################
+
+                try:
+
+                    if msgRespondida == False:
+
+                        idChat = responseBot[indexLoop]['message']['from']['id']
+                        nome = responseBot[indexLoop]['message']['from']['first_name']
+                        SigmaFinBot().enviarMensagemGuiada(idChat, f"Olá, {nome}. tudo certo? \n\nInfelizmente não compreendi o que você deseja... Aconselho você em clicar no botão [🗿 MENU] e checar nosso menu com opções de atendimento.", ["[🗿 MENU]"])
+
                 except:
 
                     pass

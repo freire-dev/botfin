@@ -66,6 +66,7 @@ class db:
         countPagto = 0
         countMembro = 0
         addPagto = False
+        msgEnviada = False
 
         while countPagto != dataPagto['qtdPag']:
 
@@ -81,6 +82,7 @@ class db:
 
                                 SigmaFinBot().enviarMensagem(idUser, f"Olá, {nomeUser}. Você já está com um pagamento em aberto. Segue chave pix abaixo para efetuar o pagamento:")
                                 SigmaFinBot().enviarMensagemGuiada(idUser, f"{dataPagto['listPag'][countPagto][4]}", ["[🗿 MENU]"])
+                                msgEnviada = True
                                 addPagto = True
                                 countPagto = dataPagto['qtdPag']
                                 countMembro = dataMembros['qtdMembros']
@@ -111,6 +113,7 @@ class db:
 
                                 SigmaFinBot().enviarMensagem(idUser, f"Olá, {nomeUser}. Você já está com um pagamento em aberto. Segue chave pix abaixo para efetuar o pagamento:")
                                 SigmaFinBot().enviarMensagemGuiada(idUser, f"{dataPagto['listPag'][countPagto][4]}", ["[🗿 MENU]"])
+                                msgEnviada = True
                                 addPagto = True
                                 countPagto = dataPagto['qtdPag']
                                 countMembro = dataMembros['qtdMembros']
@@ -118,6 +121,7 @@ class db:
                             elif dataMembros['listMembros'][countMembro][5] == 'approved': #Membro está no prazo de pagamento. Logo, não precisa pagar outra vez.
 
                                 SigmaFinBot().enviarMensagemGuiada(idUser, f"Olá, {nomeUser}! Você ainda não precisa efetuar o pagamento do mês.", ["[🗿 MENU]"])
+                                msgEnviada = True
                                 addPagto = True
                                 countPagto = dataPagto['qtdPag']
                                 countMembro = dataMembros['qtdMembros']
@@ -139,6 +143,7 @@ class db:
                                 elif dataMembros['listMembros'][countMembro][3] == 'Y':  # Membro ativo
 
                                     SigmaFinBot().enviarMensagemGuiada(idUser, f"Olá, {nomeUser}! Você ainda não precisa efetuar o pagamento do mês.", ["[🗿 MENU]"])
+                                    msgEnviada = True
                                     addPagto = True
                                     countPagto = dataPagto['qtdPag']
                                     countMembro = dataMembros['qtdMembros']
@@ -151,7 +156,6 @@ class db:
             else:  #Não é membro
                 
                 countPagto += 1
-                countMembro += 1
 
         if addPagto == False: #Verificando se um não membro já gerou pagamento
 
@@ -163,6 +167,7 @@ class db:
 
                     SigmaFinBot().enviarMensagem(idUser, f"Olá, {nomeUser}. Você já está com um pagamento em aberto. Segue chave pix abaixo para efetuar o pagamento:")
                     SigmaFinBot().enviarMensagemGuiada(idUser, f"{dataPagto['listPag'][countPagto][4]}", ["[🗿 MENU]"])
+                    msgEnviada = True
                     addPagto = True
                     countPagto = dataPagto['qtdPag']
 
@@ -177,14 +182,21 @@ class db:
             self.mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, '{idUser}', '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
             self.mydb.commit()
 
-        data = {
-        "idPagamento": novoPag['idPagamento'],
-        "nomeGateway": novoPag['nomeGateway'],
-        "pagador": novoPag['pagador'],
-        "valor": novoPag['valor'],
-        "descPagamento": novoPag['descPagamento'],
-        "chavePix": novoPag['chavePix'],
-        "detalhesPag": detalhesPag['linkDetalhes']
-        }
+        try:
 
+            data = {
+                "msgEnviada": msgEnviada,
+                "idPagamento": novoPag['idPagamento'],
+                "nomeGateway": novoPag['nomeGateway'],
+                "pagador": novoPag['pagador'],
+                "valor": novoPag['valor'],
+                "descPagamento": novoPag['descPagamento'],
+                "chavePix": novoPag['chavePix'],
+                "detalhesPag": detalhesPag['linkDetalhes']
+            }
+            
+        except:
+
+            data = {"msgEnviada": msgEnviada}
+            
         return data

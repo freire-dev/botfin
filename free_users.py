@@ -38,7 +38,7 @@ class dbfree:
         acao = False
         countUsers = 0
         dataEntrada = datetime.now() - timedelta(hours= 3) # Ajustando o horário da Europa com o Brasil
-        dataSaida = dataEntrada + timedelta(hours=2)
+        dataSaida = dataEntrada + timedelta(days = 360, hours=2) #Depois da fase de testes remover os dias e deixar somente hours=2
 
         while countUsers != users['qtdUsers']:
 

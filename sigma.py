@@ -6,7 +6,7 @@ class SigmaFinBot:
 
     def __init__(self):
 
-        self.token = '5893441186:AAEEsJgj7FbjvddfBKKMA9Hl2o7NwOC1sas'
+        self.token = '5803965560:AAE-sw2D_OotOf2VfRsIugkTo2jLWkcsZ_M'
         self.urlBase = f"https://api.telegram.org/bot{self.token}/"
 
     def enviarMensagem(self, idChat, mensagem):
