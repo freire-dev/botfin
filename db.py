@@ -126,6 +126,10 @@ class db:
                                 countPagto = dataPagto['qtdPag']
                                 countMembro = dataMembros['qtdMembros']
 
+                            else:
+
+                                countMembro += 1
+
                         elif countMembro == (dataMembros['qtdMembros'] - 1):
 
                             if idUser == dataMembros['listMembros'][countMembro][1]:
@@ -147,6 +151,10 @@ class db:
                                     addPagto = True
                                     countPagto = dataPagto['qtdPag']
                                     countMembro = dataMembros['qtdMembros']
+
+                                else:
+
+                                    countMembro += 1
 
                     else:  #Não é membro
 
