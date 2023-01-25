@@ -32,7 +32,7 @@ class dbfree:
 
         return dataUsers
     
-    def addUserFree(self, idUser, nomeUser):
+    def addUserFree(self, idUser, nomeUser, username):
 
         users = self.listarUsers()
         acao = False
@@ -54,7 +54,7 @@ class dbfree:
 
         if acao == False:
 
-            self.mycursor.execute(f"INSERT INTO free_users VALUES(DEFAULT, '{idUser}', '{nomeUser}', 'N', 'Y', '{dataEntrada}', '{dataSaida}');")
+            self.mycursor.execute(f"INSERT INTO free_users VALUES(DEFAULT, '{idUser}', '{nomeUser}', '{username}', 'N', 'Y', '{dataEntrada}', '{dataSaida}');")
             self.mydb.commit()
             status = 'Usuário adicionado'
             print(f"Usuário de ID {idUser} - {nomeUser} foi adicionado ao grupo gratuitamente por 2 horas.")

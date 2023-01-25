@@ -103,7 +103,16 @@ while True:
 
                         idChat = responseBot['message']['from']['id']
                         nome = responseBot['message']['from']['first_name']
-                        addUserFree = dbfree().addUserFree(idChat, nome)
+
+                        try:
+
+                            username = responseBot['message']['from']['username']
+
+                        except:
+
+                            username = 'NÃO TEM'
+
+                        addUserFree = dbfree().addUserFree(idChat, nome, username)
 
                         if addUserFree == 'Usuário adicionado':
 
@@ -227,7 +236,16 @@ while True:
 
                         idChat = responseBot[indexLoop]['message']['from']['id']
                         nome = responseBot[indexLoop]['message']['from']['first_name']
-                        addUserFree = dbfree().addUserFree(idChat, nome)
+
+                        try:
+
+                            username = responseBot[indexLoop]['message']['from']['username']
+
+                        except:
+
+                            username = 'NÃO TEM'
+
+                        addUserFree = dbfree().addUserFree(idChat, nome, username)
 
                         if addUserFree == 'Usuário adicionado':
 
