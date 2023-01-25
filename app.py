@@ -108,21 +108,22 @@ while True:
 
                             username = responseBot['message']['from']['username']
 
+                            addUserFree = dbfree().addUserFree(idChat, nome, username)
+
+                            if addUserFree == 'Usuário adicionado':
+
+                                SigmaFinBot().enviarMensagemGuiada(idChat, f"Um enorme prazer em saber disso, {nome}! \n\nComo cortesia, para você conhecer melhor o bot de estatística, iremos adicioná-lo automáticamente para uma degustação 0800 por 2 horas para fazer suas apostas. \n\nAproveite!!!", ["[🗿 MENU]"])
+
+                            elif addUserFree == 'Já foi usuário free':
+                            
+                                SigmaFinBot().enviarMensagemGuiada(idChat, f"Um enorme prazer em saber disso, {nome}! \n\nO valor mensal para permanecer no Grupo VIP recebendo as estatísticas em tempo real dos jogos é de R$29,90 [Somente PIX]. \n\nAssim que identificamos o pagamento, automaticamente adicionaremos você ao Grupo VIP para LUCRAR MUITO! 😎\n\nDas opções abaixo, clique para: \n💸 Realizar pagamento \n[🗿 MENU] Voltar para o menu principal", ["💸","[🗿 MENU]"])
+
+                            msgRespondida = True
+
                         except:
 
-                            username = 'NÃO TEM'
-
-                        addUserFree = dbfree().addUserFree(idChat, nome, username)
-
-                        if addUserFree == 'Usuário adicionado':
-
-                            SigmaFinBot().enviarMensagemGuiada(idChat, f"Um enorme prazer em saber disso, {nome}! \n\nComo cortesia, para você conhecer melhor o bot de estatística, iremos adicioná-lo automáticamente para uma degustação 0800 por 2 horas para fazer suas apostas. \n\nAproveite!!!", ["[🗿 MENU]"])
-
-                        elif addUserFree == 'Já foi usuário free':
-                        
-                            SigmaFinBot().enviarMensagemGuiada(idChat, f"Um enorme prazer em saber disso, {nome}! \n\nO valor mensal para permanecer no Grupo VIP recebendo as estatísticas em tempo real dos jogos é de R$29,90 [Somente PIX]. \n\nAssim que identificamos o pagamento, automaticamente adicionaremos você ao Grupo VIP para LUCRAR MUITO! 😎\n\nDas opções abaixo, clique para: \n💸 Realizar pagamento \n[🗿 MENU] Voltar para o menu principal", ["💸","[🗿 MENU]"])
-
-                        msgRespondida = True
+                            SigmaFinBot().enviarMensagemGuiada(idChat, f"{nome}, foi identificado que você não possuí nome de usuário definido no Telegram. Para participar no grupo, precisará definí-lo. \n\nCaso não saiba como definir o nome do usuário no Telegram, veja o vídeo: https://www.youtube.com/watch?v=7B9HJ0tT9Ns", ["[🗿 MENU]"])
+                            msgRespondida = True
 
                 except:
 
@@ -136,20 +137,30 @@ while True:
                         dataExp = dataHoje + timedelta(days = 2)
                         idChat = responseBot['message']['from']['id']
                         nome = responseBot['message']['from']['first_name']
-                        payment = db().addPagDb(idChat, nome, dataHoje, dataExp)
-                        dataExp = dataExp.strftime("%d/%m/%Y")
 
-                        if payment['msgEnviada'] == False:
+                        try:
 
-                            SigmaFinBot().enviarMensagem(idChat, f"Recebemos sua solicitação de pagamento, {nome}! \n\n⬇️ Chave Pix ⬇️")
-                            SigmaFinBot().enviarMensagem(idChat, f"{payment['chavePix']}")
-                            SigmaFinBot().enviarMensagemGuiada(idChat, f"Segue abaixo as informações do pagamento: \n\nId pagamento: {payment['idPagamento']} \nMeio de pagamento: {payment['nomeGateway']} \nPagador: {payment['pagador']} \nValor: {payment['valor']} \nDescrição: {payment['descPagamento']} \nData de vencimento: {dataExp} \n\nEspero e vejo você lá no Grupo VIP, {nome}! 🚀", ["[🗿 MENU]"])
+                            username = responseBot['message']['from']['username']
+
+                            payment = db().addPagDb(idChat, nome, username, dataHoje, dataExp)
+                            dataExp = dataExp.strftime("%d/%m/%Y")
+
+                            if payment['msgEnviada'] == False:
+
+                                SigmaFinBot().enviarMensagem(idChat, f"Recebemos sua solicitação de pagamento, {nome}! \n\n⬇️ Chave Pix ⬇️")
+                                SigmaFinBot().enviarMensagem(idChat, f"{payment['chavePix']}")
+                                SigmaFinBot().enviarMensagemGuiada(idChat, f"Segue abaixo as informações do pagamento: \n\nId pagamento: {payment['idPagamento']} \nMeio de pagamento: {payment['nomeGateway']} \nPagador: {payment['pagador']} \nValor: {payment['valor']} \nDescrição: {payment['descPagamento']} \nData de vencimento: {dataExp} \n\nEspero e vejo você lá no Grupo VIP, {nome}! 🚀", ["[🗿 MENU]"])
+                                msgRespondida = True
+                            
+                            else:
+
+                                msgRespondida = True
+                                pass
+
+                        except:
+
+                            SigmaFinBot().enviarMensagemGuiada(idChat, f"{nome}, foi identificado que você não possuí nome de usuário definido no Telegram. Para participar no grupo, precisará definí-lo. \n\nCaso não saiba como definir o nome do usuário no Telegram, veja o vídeo: https://www.youtube.com/watch?v=7B9HJ0tT9Ns", ["[🗿 MENU]"])
                             msgRespondida = True
-                        
-                        else:
-
-                            msgRespondida = True
-                            pass
 
                 except:
 
@@ -241,21 +252,22 @@ while True:
 
                             username = responseBot[indexLoop]['message']['from']['username']
 
+                            addUserFree = dbfree().addUserFree(idChat, nome, username)
+
+                            if addUserFree == 'Usuário adicionado':
+
+                                SigmaFinBot().enviarMensagemGuiada(idChat, f"Um enorme prazer em saber disso, {nome}! \n\nComo cortesia, para você conhecer melhor o bot de estatística, iremos adicioná-lo automáticamente para uma degustação 0800 por 2 horas para fazer suas apostas. \n\nAproveite!!!", ["[🗿 MENU]"])
+
+                            elif addUserFree == 'Já foi usuário free':
+                            
+                                SigmaFinBot().enviarMensagemGuiada(idChat, f"Um enorme prazer em saber disso, {nome}! \n\nO valor mensal para permanecer no Grupo VIP recebendo as estatísticas em tempo real dos jogos é de R$29,90 [Somente PIX]. \n\nAssim que identificamos o pagamento, automaticamente adicionaremos você ao Grupo VIP para LUCRAR MUITO! 😎\n\nDas opções abaixo, clique para: \n💸 Realizar pagamento \n[🗿 MENU] Voltar para o menu principal", ["💸","[🗿 MENU]"])
+
+                            msgRespondida = True
+
                         except:
 
-                            username = 'NÃO TEM'
-
-                        addUserFree = dbfree().addUserFree(idChat, nome, username)
-
-                        if addUserFree == 'Usuário adicionado':
-
-                            SigmaFinBot().enviarMensagemGuiada(idChat, f"Um enorme prazer em saber disso, {nome}! \n\nComo cortesia, para você conhecer melhor o bot de estatística, iremos adicioná-lo automáticamente para uma degustação 0800 por 2 horas para fazer suas apostas. \n\nAproveite!!!", ["[🗿 MENU]"])
-
-                        elif addUserFree == 'Já foi usuário free':
-                        
-                            SigmaFinBot().enviarMensagemGuiada(idChat, f"Um enorme prazer em saber disso, {nome}! \n\nO valor mensal para permanecer no Grupo VIP recebendo as estatísticas em tempo real dos jogos é de R$29,90 [Somente PIX]. \n\nAssim que identificamos o pagamento, automaticamente adicionaremos você ao Grupo VIP para LUCRAR MUITO! 😎\n\nDas opções abaixo, clique para: \n💸 Realizar pagamento \n[🗿 MENU] Voltar para o menu principal", ["💸","[🗿 MENU]"])
-
-                        msgRespondida = True
+                            SigmaFinBot().enviarMensagemGuiada(idChat, f"{nome}, foi identificado que você não possuí nome de usuário definido no Telegram. Para participar no grupo, precisará definí-lo. \n\nCaso não saiba como definir o nome do usuário no Telegram, veja o vídeo: https://www.youtube.com/watch?v=7B9HJ0tT9Ns", ["[🗿 MENU]"])
+                            msgRespondida = True
 
                 except:
 
@@ -269,19 +281,29 @@ while True:
                         dataExp = dataHoje + timedelta(days = 2)
                         idChat = responseBot[indexLoop]['message']['from']['id']
                         nome = responseBot[indexLoop]['message']['from']['first_name']
-                        payment = db().addPagDb(idChat, nome, dataHoje, dataExp)
-                        dataExp = dataExp.strftime("%d/%m/%Y")
 
-                        if payment['msgEnviada'] == False:
-                            SigmaFinBot().enviarMensagem(idChat, f"Recebemos sua solicitação de pagamento, {nome}! \n\n⬇️ Chave Pix ⬇️")
-                            SigmaFinBot().enviarMensagem(idChat, f"{payment['chavePix']}")
-                            SigmaFinBot().enviarMensagemGuiada(idChat, f"Segue abaixo as informações do pagamento: \n\nId pagamento: {payment['idPagamento']} \nMeio de pagamento: {payment['nomeGateway']} \nPagador: {payment['pagador']} \nValor: {payment['valor']} \nDescrição: {payment['descPagamento']} \nData de vencimento: {dataExp} \n\nEspero e vejo você lá no Grupo VIP, {nome}! 🚀", ["[🗿 MENU]"])
-                            msgRespondida = True
+                        try: 
+
+                            username = responseBot[indexLoop]['message']['from']['username']
+                            
+                            payment = db().addPagDb(idChat, nome, username, dataHoje, dataExp)
+                            dataExp = dataExp.strftime("%d/%m/%Y")
+
+                            if payment['msgEnviada'] == False:
+                                SigmaFinBot().enviarMensagem(idChat, f"Recebemos sua solicitação de pagamento, {nome}! \n\n⬇️ Chave Pix ⬇️")
+                                SigmaFinBot().enviarMensagem(idChat, f"{payment['chavePix']}")
+                                SigmaFinBot().enviarMensagemGuiada(idChat, f"Segue abaixo as informações do pagamento: \n\nId pagamento: {payment['idPagamento']} \nMeio de pagamento: {payment['nomeGateway']} \nPagador: {payment['pagador']} \nValor: {payment['valor']} \nDescrição: {payment['descPagamento']} \nData de vencimento: {dataExp} \n\nEspero e vejo você lá no Grupo VIP, {nome}! 🚀", ["[🗿 MENU]"])
+                                msgRespondida = True
                         
-                        else:
+                            else:
 
+                                msgRespondida = True
+                                pass
+
+                        except:
+
+                            SigmaFinBot().enviarMensagemGuiada(idChat, f"{nome}, foi identificado que você não possuí nome de usuário definido no Telegram. Para participar no grupo, precisará definí-lo. \n\nCaso não saiba como definir o nome do usuário no Telegram, veja o vídeo: https://www.youtube.com/watch?v=7B9HJ0tT9Ns", ["[🗿 MENU]"])
                             msgRespondida = True
-                            pass
 
                 except:
 

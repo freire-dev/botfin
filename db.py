@@ -57,7 +57,7 @@ class db:
         return dataMembros
 
 
-    def addPagDb(self, idUser, nomeUser, dataGer, dataVenc):
+    def addPagDb(self, idUser, nomeUser, username, dataGer, dataVenc):
 
         idUser = str(idUser)
 
@@ -91,7 +91,7 @@ class db:
 
                                 novoPag = createPayment(idUser, nomeUser, dataVenc)
                                 detalhesPag = statusPayment(novoPag['idPagamento'])
-                                self.mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, '{idUser}', '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
+                                self.mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, '{idUser}', '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}', '{username}');")
                                 self.mydb.commit()
                                 addPagto = True
                                 countPagto = dataPagto['qtdPag']
@@ -103,7 +103,7 @@ class db:
                             
                                 novoPag = createPayment(idUser, nomeUser, dataVenc)
                                 detalhesPag = statusPayment(novoPag['idPagamento'])
-                                self.mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, '{idUser}', '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
+                                self.mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, '{idUser}', '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}', '{username}');")
                                 self.mydb.commit()
                                 addPagto = True
                                 countPagto = dataPagto['qtdPag']
@@ -134,7 +134,7 @@ class db:
 
                                     novoPag = createPayment(idUser, nomeUser, dataVenc)
                                     detalhesPag = statusPayment(novoPag['idPagamento'])
-                                    self.mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, '{idUser}', '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
+                                    self.mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, '{idUser}', '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}', '{username}');")
                                     self.mydb.commit()
                                     addPagto = True
                                     countPagto = dataPagto['qtdPag']
@@ -179,7 +179,7 @@ class db:
 
             novoPag = createPayment(idUser, nomeUser, dataVenc)
             detalhesPag = statusPayment(novoPag['idPagamento'])
-            self.mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, '{idUser}', '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}');")
+            self.mycursor.execute(f"INSERT INTO payments VALUES(DEFAULT, '{idUser}', '{nomeUser}', '{novoPag['idPagamento']}', '{novoPag['chavePix']}', '{detalhesPag['status']}', NULL, '{dataGer}', '{dataVenc}', '{username}');")
             self.mydb.commit()
 
         try:
